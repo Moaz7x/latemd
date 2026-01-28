@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "lesson": {
+    "id": "",
+    "metadata": {
+      "subject": "",
+      "topic": "",
+      "grade": "",
+      "language": "",
+      "difficulty": ""
+    },
+    "title": "",
+    "intro": {
+      "text": "",
+      "tone": ""
+    },
+    "units": [
+      {
+        "id": "",
+        "title": "",
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          },
+          {
+            "type": "mnemonic",
+            "key": "",
+            "story": ""
+          },
+          {
+            "type": "visual",
+            "visual_type": "",
+            "engine": "",
+            "code": "",
+            "fallback": {
+              "type": "",
+              "description": ""
+            }
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "type": "",
+      "engine": "",
+      "code": ""
+    }
+  }
+}

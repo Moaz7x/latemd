@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LateMD Web Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 25px;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .units-container {
+            margin: 25px 0;
+        }
+        
+        .unit-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .visuals-container {
+            margin: 15px 0;
+        }
+        
+        .visual-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .visual-type {
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .mnemonic-section {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .mnemonic-section h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        #preview-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('editor')">Editor</button>
+            <button class="tab" onclick="switchTab('preview')">Preview</button>
+        </div>
+        
+        <!-- Editor Tab -->
+        <div id="editor" class="tab-content active">
+            <h1>LateMD Lesson Editor</h1>
+            
+            <div class="form-group">
+                <label for="title">Lesson Title</label>
+                <input type="text" id="title" placeholder="Enter lesson title...">
+            </div>
+            
+            <div class="form-group">
+                <label for="intro">Introduction</label>
+                <textarea id="intro" placeholder="Enter lesson introduction..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="mindmap">Mindmap (Mermaid code)</label>
+                <textarea id="mindmap" placeholder="Enter Mermaid mindmap code..."></textarea>
+            </div>
+            
+            <div class="units-container">
+                <h2>Units</h2>
+                <div id="units-list">
+                    <!-- Units will be dynamically added here -->
+                </div>
+                <button class="btn" onclick="addUnit()">Add Unit</button>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" onclick="saveLesson()">Save Lesson</button>
+                <button class="btn btn-secondary" onclick="exportLesson()">Export JSON</button>
+            </div>
+        </div>
+        
+        <!-- Preview Tab -->
+        <div id="preview" class="tab-content">
+            <div id="preview-section">
+                <!-- Preview content will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global lesson data
+        let lessonData = {
+            title: '',
+            intro: '',
+            units: [],
+            mindmap: ''
+        };
+        
+        // Initialize the editor
+        function init() {
+            // Set up initial unit
+            addUnit();
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content and mark tab as active
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Update preview if switching to preview tab
+            if (tabName === 'preview') {
+                updatePreview();
+            }
+        }
+        
+        // Add a new unit
+        function addUnit() {
+            const unitId = lessonData.units.length;
+            const unit = {
+                title: `Unit ${unitId + 1}`,
+                text: '',
+                mnemonic: '',
+                mnemonicStory: '',
+                visuals: []
+            };
+            
+            lessonData.units.push(unit);
+            renderUnit(unitId);
+        }
+        
+        // Remove a unit
+        function removeUnit(unitId) {
+            if (lessonData.units.length > 1) {
+                lessonData.units.splice(unitId, 1);
+                renderAllUnits();
+            }
+        }
+        
+        // Add a visual to a unit
+        function addVisual(unitId) {
+            const visualId = lessonData.units[unitId].visuals.length;
+            const visual = {
+                type: 'vega-lite',
+                data: {},
+                options: {}
+            };
+            
+            lessonData.units[unitId].visuals.push(visual);
+            renderUnit(unitId);
+        }
+        
+        // Remove a visual from a unit
+        function removeVisual(unitId, visualId) {
+            lessonData.units[unitId].visuals.splice(visualId, 1);
+            renderUnit(unitId);
+        }
+        
+        // Render all units
+        function renderAllUnits() {
+            const unitsList = document.getElementById('units-list');
+            unitsList.innerHTML = '';
+            
+            lessonData.units.forEach((_, index) => {
+                renderUnit(index);
+            });
+        }
+        
+        // Render a single unit
+        function renderUnit(unitId) {
+            const unit = lessonData.units[unitId];
+            const unitsList = document.getElementById('units-list');
+            
+            // Create unit card
+            const unitCard = document.createElement('div');
+            unitCard.className = 'unit-card';
+            unitCard.innerHTML = `
+                <div class="unit-header">
+                    <h3>Unit ${unitId + 1}</h3>
+                    <button class="btn btn-danger" onclick="removeUnit(${unitId})">Remove</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="unit-title-${unitId}">Unit Title</label>
+                    <input type="text" id="unit-title-${unitId}" value="${unit.title}" oninput="updateUnitTitle(${unitId}, this.value)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="unit-text-${unitId}">Unit Text</label>
+                    <textarea id="unit-text-${unitId}" oninput="updateUnitText(${unitId}, this.value)">${unit.text}</textarea>
+                </div>
+                
+                <div class="mnemonic-section">
+                    <h4>Mnemonic</h4>
+                    <div class="form-group">
+                        <label for="unit-mnemonic-${unitId}">Mnemonic Phrase</label>
+                        <input type="text" id="unit-mnemonic-${unitId}" value="${unit.mnemonic}" oninput="updateUnitMnemonic(${unitId}, this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit-mnemonic-story-${unitId}">Mnemonic Story</label>
+                        <textarea id="unit-mnemonic-story-${unitId}" oninput="updateUnitMnemonicStory(${unitId}, this.value)">${unit.mnemonicStory}</textarea>
+                    </div>
+                </div>
+                
+                <div class="visuals-container">
+                    <h4>Visuals</h4>
+                    <div id="visuals-list-${unitId}">
+                        <!-- Visuals will be dynamically added here -->
+                    </div>
+                    <button class="btn btn-secondary" onclick="addVisual(${unitId})">Add Visual</button>
+                </div>
+            `;
+            
+            // Render visuals for this unit
+            const visualsList = unitCard.querySelector(`#visuals-list-${unitId}`);
+            unit.visuals.forEach((visual, visualId) => {
+                const visualItem = document.createElement('div');
+                visualItem.className = 'visual-item';
+                visualItem.innerHTML = `
+                    <div class="visual-type">${visual.type}</div>
+                    <div class="form-group">
+                        <label for="visual-data-${unitId}-${visualId}">Data</label>
+                        <textarea id="visual-data-${unitId}-${visualId}" oninput="updateVisualData(${unitId}, ${visualId}, this.value)">${JSON.stringify(visual.data, null, 2)}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="visual-options-${unitId}-${visualId}">Options</label>
+                        <textarea id="visual-options-${unitId}-${visualId}" oninput="updateVisualOptions(${unitId}, ${visualId}, this.value)">${JSON.stringify(visual.options, null, 2)}</textarea>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeVisual(${unitId}, ${visualId})">Remove Visual</button>
+                `;
+                visualsList.appendChild(visualItem);
+            });
+            
+            // Replace existing unit or append new one
+            const existingUnit = unitsList.querySelector(`[data-unit-id="${unitId}"]`);
+            if (existingUnit) {
+                existingUnit.replaceWith(unitCard);
+            } else {
+                unitCard.setAttribute('data-unit-id', unitId);
+                unitsList.appendChild(unitCard);
+            }
+        }
+        
+        // Update unit title
+        function updateUnitTitle(unitId, value) {
+            lessonData.units[unitId].title = value;
+        }
+        
+        // Update unit text
+        function updateUnitText(unitId, value) {
+            lessonData.units[unitId].text = value;
+        }
+        
+        // Update unit mnemonic
+        function updateUnitMnemonic(unitId, value) {
+            lessonData.units[unitId].mnemonic = value;
+        }
+        
+        // Update unit mnemonic story
+        function updateUnitMnemonicStory(unitId, value) {
+            lessonData.units[unitId].mnemonicStory = value;
+        }
+        
+        // Update visual data
+        function updateVisualData(unitId, visualId, value) {
+            try {
+                lessonData.units[unitId].visuals[visualId].data = JSON.parse(value);
+            } catch (e) {
+                console.error('Invalid JSON for visual data:', e);
+            }
+        }
+        
+        // Update visual options
+        function updateVisualOptions(unitId, visualId, value) {
+            try {
+                lessonData.units[unitId].visuals[visualId].options = JSON.parse(value);
+            } catch (e) {
+                console.error('Invalid JSON for visual options:', e);
+            }
+        }
+        
+        // Update preview
+        function updatePreview() {
+            const previewSection = document.getElementById('preview-section');
+            
+            // Collect current form data
+            lessonData.title = document.getElementById('title').value;
+            lessonData.intro = document.getElementById('intro').value;
+            lessonData.mindmap = document.getElementById('mindmap').value;
+            
+            // Generate preview HTML
+            let previewHtml = `
+                <h1>${lessonData.title || 'Untitled Lesson'}</h1>
+                <p>${lessonData.intro || 'No introduction yet.'}</p>
+            `;
+            
+            // Add units to preview
+            lessonData.units.forEach((unit, index) => {
+                previewHtml += `
+                    <h2>Unit ${index + 1}: ${unit.title}</h2>
+                    <p>${unit.text}</p>
+                `;
+                
+                // Add mnemonic if present
+                if (unit.mnemonic || unit.mnemonicStory) {
+                    previewHtml += `
+                        <div class="mnemonic-section">
+                            <h4>Mnemonic</h4>
+                    `;
+                    
+                    if (unit.mnemonic) {
+                        previewHtml += `<p><strong>Phrase:</strong> ${unit.mnemonic}</p>`;
+                    }
+                    
+                    if (unit.mnemonicStory) {
+                        previewHtml += `<p><strong>Story:</strong> ${unit.mnemonicStory}</p>`;
+                    }
+                    
+                    previewHtml += `</div>`;
+                }
+                
+                // Add visuals to preview
+                if (unit.visuals.length > 0) {
+                    previewHtml += `<h4>Visuals</h4>`;
+                    unit.visuals.forEach((visual, visualIndex) => {
+                        previewHtml += `
+                            <div class="visual-item">
+                                <div class="visual-type">${visual.type}</div>
+                                <pre>${JSON.stringify(visual.data, null, 2)}</pre>
+                                <pre>${JSON.stringify(visual.options, null, 2)}</pre>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            
+            // Add mindmap if present
+            if (lessonData.mindmap) {
+                previewHtml += `
+                    <h2>Mindmap</h2>
+                    <pre>${lessonData.mindmap}</pre>
+                `;
+            }
+            
+            previewSection.innerHTML = previewHtml;
+        }
+        
+        // Save lesson to Flutter
+        function saveLesson() {
+            // Collect current form data
+            lessonData.title = document.getElementById('title').value;
+            lessonData.intro = document.getElementById('intro').value;
+            lessonData.mindmap = document.getElementById('mindmap').value;
+            
+            // Send data to Flutter
+            if (window.FlutterBridge) {
+                const message = {
+                    action: 'saveLesson',
+                    data: lessonData
+                };
+                window.FlutterBridge.postMessage(JSON.stringify(message));
+                alert('Lesson saved successfully!');
+            } else {
+                console.error('FlutterBridge not available');
+                alert('Error: Could not save lesson to Flutter.');
+            }
+        }
+        
+        // Export lesson as JSON
+        function exportLesson() {
+            // Collect current form data
+            lessonData.title = document.getElementById('title').value;
+            lessonData.intro = document.getElementById('intro').value;
+            lessonData.mindmap = document.getElementById('mindmap').value;
+            
+            // Create download link
+            const dataStr = JSON.stringify(lessonData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${lessonData.title || 'lesson'}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Load lesson data from Flutter
+        window.loadLessonData = function(lessonJson) {
+            lessonData = lessonJson;
+            
+            // Populate form fields
+            document.getElementById('title').value = lessonData.title;
+            document.getElementById('intro').value = lessonData.intro;
+            document.getElementById('mindmap').value = lessonData.mindmap;
+            
+            // Render all units
+            renderAllUnits();
+        };
+        
+        // Initialize the editor when the page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
